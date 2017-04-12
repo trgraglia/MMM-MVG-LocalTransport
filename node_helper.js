@@ -14,6 +14,7 @@ const unirest = require('unirest');
 module.exports = NodeHelper.create({
 
     start: function () {
+        Log.info("Starting node helper for: " + this.name);
         this.started = false;
     },
 
