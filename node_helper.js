@@ -14,7 +14,6 @@ const unirest = require('unirest');
 module.exports = NodeHelper.create({
 
     start: function () {
-        Log.info("Starting node helper for: " + this.name);
         this.started = false;
     },
 
@@ -23,7 +22,6 @@ module.exports = NodeHelper.create({
      */
     updateTimetable: function () {
         var url = this.config.apiBase + this.config.id;
-        var self = this;
         var retry = true;
         var data = {};
 
@@ -34,11 +32,11 @@ module.exports = NodeHelper.create({
             .send(JSON.stringify(data))
             .end(function (json) {
                 console.log("RESPONSE: ", JSON.stringify(json.departures));
-                self.processTrains(json.departures);
+                this.processTrains(json.departures);
 
-                if (retry) {
-                    self.scheduleUpdate((self.loaded) ? -1 : this.config.retryDelay);
-                }
+                /*if (retry) {
+                    this.scheduleUpdate(this.loaded ? -1 : this.config.retryDelay);
+                }*/
             });
     },
 
@@ -46,7 +44,6 @@ module.exports = NodeHelper.create({
      * Uses the received data to build a data structure for rendering.
      */
     processTrains: function (departures) {
-        var self = this;
         var now = new Date();
         var items = {};
 
@@ -65,9 +62,9 @@ module.exports = NodeHelper.create({
             items[destination]['departureTimes'].push(departureMinutes);
         }
 
-        self.items = items;
-        self.loaded = true;
-        self.sendSocketNotification("TRAINS", self.items);
+        this.items = items;
+        this.loaded = true;
+        this.sendSocketNotification("TRAINS", this.items);
     },
 
     /* scheduleUpdate()

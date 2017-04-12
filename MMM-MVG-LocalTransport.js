@@ -41,6 +41,7 @@ Module.register("MMM-MVG-LocalTransport", {
 
     // Override dom generator.
     getDom: function () {
+        Log.info("Getting DOM: " + this.name);
         var wrapper = document.createElement("div");
 
         if (this.config.id === "") {
@@ -55,6 +56,7 @@ Module.register("MMM-MVG-LocalTransport", {
             return wrapper;
         }
 
+        Log.info("Creating departures table: " + this.name);
         var table = document.createElement("table");
         //table.className = "small";
 
