@@ -22,7 +22,7 @@ Module.register("MMM-MVG-LocalTransport", {
         fadePoint: 0.25, // Start on 1/4th of the list.
         initialLoadDelay: 0, // start delay seconds.
         apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py?station=',
-        id: '340'
+        id: ''
     },
 
     // Define required scripts.
@@ -56,7 +56,7 @@ Module.register("MMM-MVG-LocalTransport", {
         }
 
         var table = document.createElement("table");
-        table.className = "small";
+        //table.className = "small";
 
         var items = this.items;
 
