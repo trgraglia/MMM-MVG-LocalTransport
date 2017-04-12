@@ -25,18 +25,19 @@ module.exports = NodeHelper.create({
         var retry = true;
         var data = {};
 
-        unirest.post(url)
+        unirest.get(url)
             .headers({
-                'Content-Type': 'application/json;charset=UTF-8'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             })
             .send(JSON.stringify(data))
             .end(function (json) {
-                console.log("RESPONSE: ", JSON.stringify(json.departures));
-                this.processTrains(json.departures);
+                console.log("RESPONSE: ", JSON.stringify(json));
+                this.processTrains(json['departures']);
 
                 /*if (retry) {
-                    this.scheduleUpdate(this.loaded ? -1 : this.config.retryDelay);
-                }*/
+                 this.scheduleUpdate(this.loaded ? -1 : this.config.retryDelay);
+                 }*/
             });
     },
 
