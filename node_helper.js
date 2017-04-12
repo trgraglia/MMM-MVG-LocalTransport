@@ -21,6 +21,7 @@ module.exports = NodeHelper.create({
      * Calls processTrains on successful response.
      */
     updateTimetable: function () {
+        var self = this;
         var url = this.config.apiBase + this.config.id;
         var retry = true;
         var data = {};
@@ -31,9 +32,9 @@ module.exports = NodeHelper.create({
                 'Content-Type': 'application/json'
             })
             .send(JSON.stringify(data))
-            .end(function (json) {
-                console.log("RESPONSE: ", JSON.stringify(json));
-                this.processTrains(json['departures']);
+            .end(function (response) {
+                console.log("RESPONSE: ", JSON.stringify(response));
+                self.processTrains(response['departures']);
 
                 /*if (retry) {
                  this.scheduleUpdate(this.loaded ? -1 : this.config.retryDelay);
