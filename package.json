@@ -1,0 +1,27 @@
+{
+    "name": "MMM-MVG-LocalTransport",
+    "version": "0.1.0",
+    "description": "Local transport in Munich module for MagicMirror",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/trgraglia/MMM-MVG-LocalTransport"
+    },
+    "keywords": [
+        "magic mirror",
+        "smart mirror",
+        "localtransport",
+        "module",
+        "mvg"
+    ],
+    "author": "Anthony Graglia",
+    "contributors": "https://github.com/trgraglia/MMM-MVG-LocalTransport/graphs/contributors",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/trgraglia/MMM-MVG-LocalTransport/issues"
+    },
+    "homepage": "https://github.com/trgraglia/MMM-MVG-LocalTransport#readme",
+    "dependencies": {
+        "unirest": "latest",
+        "node-forge": "latest"
+    }
+}
