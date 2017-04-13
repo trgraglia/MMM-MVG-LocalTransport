@@ -12,8 +12,6 @@
 Module.register('MMM-MVG-LocalTransport', {
     defaults: {
         retryDelay: 1000,
-        maximumEntries: 10, // Total Maximum Entries
-        maxTimeOffset: 200, // Max time in the future for entries
         updateInterval: 30 * 1000, // Update every minute.
         animationSpeed: 2000,
         fade: true,
@@ -23,19 +21,30 @@ Module.register('MMM-MVG-LocalTransport', {
         id: ''
     },
     start: function () {
-        Log.info(this.name + ' : Starting module');
-        this.sendSocketNotification(this.name + '_CONFIG', this.config);
-        this.items = {};
-        this.loaded = false;
-        this.url = this.config.apiBase + this.config.id;
+        //var self = this;
+        Log.info(this.name + ' : ' + 'Starting module');
         this.updateTimer = null;
+        this.url = this.config.apiBase + this.config.id;
+
+        this.scheduleUpdate();
+
+        /*setInterval(function() {
+            self.updateDom();
+        }, 30000);*/
     },
-    socketNotificationReceived: function (notification, payload) {
-        if (notification === this.name + '_TRAINS') {
-            Log.info('Notification: ' + this.name + '_TRAINS');
+    scheduleUpdate: function (delay) {
+        var self = this;
+
+        clearTimeout(this.updateTimer);
+        this.updateTimer = setTimeout(function () {
+            self.sendSocketNotification('GETDATA', self.config);
+        }, !!delay ? delay : this.config.updateInterval);
+    },
+    socketNotificationReceived: function(notification, payload) {
+        if (notification === 'DATARECEIVED') {
             this.items = payload;
-            this.loaded = true;
-            this.updateDom(this.config.animationSpeed);
+            this.updateDom();
+            this.scheduleUpdate();
         }
     },
     getStyles: function () {
@@ -58,7 +67,7 @@ Module.register('MMM-MVG-LocalTransport', {
         }
 
         Log.info(this.name + ' : Creating departures table');
-        
+
         var table = document.createElement('table');
         table.className = 'small mmm-mvg-table';
 

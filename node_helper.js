@@ -1,3 +1,5 @@
+'use strict';
+
 /* Magic Mirror
  * Module: MVG-LocalTransport
  *
@@ -7,78 +9,23 @@
  * MIT Licensed.
  */
 
-var NodeHelper = require("node_helper");
-var forge = require('node-forge');
-var unirest = require('unirest');
+const NodeHelper = require('node_helper');
+var request = require('request');
 
 module.exports = NodeHelper.create({
     start: function () {
-        console.log(this.name + ': Helper started');
-
-        this.started = false;
+        this.config = {};
     },
     socketNotificationReceived: function (notification, payload) {
-        if (notification === this.name + '_CONFIG') {
-            console.log('Notification: ' + this.name + '_CONFIG');
-
-            if (this.started) {
-                return;
-            }
-
+        if (notification === 'GETDATA') {
             this.config = payload;
-            this.started = true;
-            this.scheduleUpdate(this.config.initialLoadDelay);
+            this.getStationData(this.processJson);
+            this.sendSocketNotification('DATARECEIVED', this.config);
         }
     },
-    /***
-     * scheduleUpdate()
-     * Schedules the next update.
-     * @integer - Milliseconds before next update. If empty, this.config.updateInterval is used.
-     */
-    scheduleUpdate: function (delay) {
-        var self = this;
-
-        clearTimeout(self.updateTimer);
-        self.updateTimer = setTimeout(function () {
-            self.updateTimetable();
-        }, !!delay ? delay : self.config.updateInterval);
-    },
-    /***
-     * updateTimetable()
-     * Calls processTrains on successful response.
-     */
-    updateTimetable: function () {
-        var self = this;
-        var retry = true;
-        var req = unirest.get(self.url);
-        req.headers({
-            'Content-Type': 'application/json;charset=UTF-8',
-            'Accept': 'application/json'
-        });
-        //var data = {};
-        //req.send(JSON.stringify(data));
-        req.end(function (response) {
-            console.log(self.name + " : " + response);
-
-            if (response.error) {
-                this.updateDom(self.config.animationSpeed);
-
-                retry = false;
-            } else {
-                self.processTrains(response.body);
-            }
-
-            if (retry) {
-                self.scheduleUpdate();
-            }
-        });
-    },
-    /***
-     * processTrains(departures)
-     * Uses the received data to build a data structure for rendering.
-     */
-    processTrains: function (data) {
-        var departures = data['departures'];
+    processJson: function (data) {
+        var json = JSON.parse(data);
+        var departures = json['departures'];
         var now = new Date();
         var items = {};
 
@@ -97,8 +44,19 @@ module.exports = NodeHelper.create({
             items[destination]['departureTimes'].push(departureMinutes);
         }
 
-        this.items = items;
-        this.loaded = true;
-        this.sendSocketNotification("TRAINS", this.items);
+        return items;
+    },
+    getStationData: function (callback) {
+        var self = this;
+        var url = self.url;
+
+        request(url, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var structuredData = callback(body);
+                self.sendSocketNotification('DATARECEIVED', structuredData);
+            } else {
+                console.log(self.name + ' : ERROR : ' + error)
+            }
+        });
     }
 });
