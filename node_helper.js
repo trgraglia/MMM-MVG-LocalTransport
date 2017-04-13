@@ -3,7 +3,7 @@
  *
  * By Anthony Graglia
  * Derived from Georg Peters (https://lane6.de)
- * Based on a script from Benjamin Angst http://www.beny.ch
+ * 
  * MIT Licensed.
  */
 
@@ -13,11 +13,18 @@ var unirest = require('unirest');
 
 module.exports = NodeHelper.create({
     start: function () {
-        console.log(this.name + ' helper started');
+        console.log(this.name + ': Helper started');
+
         this.started = false;
     },
     socketNotificationReceived: function (notification, payload) {
-        if (notification === (this.name + '_CONFIG') && !this.started) {
+        if (notification === this.name + '_CONFIG') {
+            console.log('Notification: ' + this.name + '_CONFIG');
+
+            if (this.started) {
+                return;
+            }
+
             this.config = payload;
             this.started = true;
             this.scheduleUpdate(this.config.initialLoadDelay);
@@ -43,7 +50,7 @@ module.exports = NodeHelper.create({
     updateTimetable: function () {
         var self = this;
         var retry = true;
-        var req = unirest.get(self.config.apiBase + self.config.id);
+        var req = unirest.get(self.url);
         req.headers({
             'Content-Type': 'application/json;charset=UTF-8',
             'Accept': 'application/json'
@@ -54,7 +61,7 @@ module.exports = NodeHelper.create({
             console.log(self.name + " : " + response);
 
             if (response.error) {
-                this.updateDom(this.config.animationSpeed);
+                this.updateDom(self.config.animationSpeed);
 
                 retry = false;
             } else {
