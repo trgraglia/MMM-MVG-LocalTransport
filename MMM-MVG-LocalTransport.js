@@ -17,32 +17,33 @@ Module.register('MMM-MVG-LocalTransport', {
         fade: true,
         fadePoint: 0.25, // Start on 1/4th of the list.
         initialLoadDelay: 0, // start delay seconds.
-        apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py?station=',
+        //apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py?station=',
+        apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py',
         id: ''
     },
     start: function () {
-        //var self = this;
-        Log.info(this.name + ' : ' + 'Starting module');
-        this.updateTimer = null;
-        this.url = this.config.apiBase + this.config.id;
+        var self = this;
 
+        Log.info('Starting module: ' + this.name);
+        this.updateTimer = null;
         this.scheduleUpdate();
 
-        /*setInterval(function() {
+        setInterval(function () {
             self.updateDom();
-        }, 30000);*/
+        }, 30000);
     },
     scheduleUpdate: function (delay) {
         var self = this;
 
         clearTimeout(this.updateTimer);
         this.updateTimer = setTimeout(function () {
-            self.sendSocketNotification('GETDATA', '');
+            self.sendSocketNotification('GETDATA', self.config);
         }, !!delay ? delay : this.config.updateInterval);
     },
-    socketNotificationReceived: function(notification, payload) {
+    socketNotificationReceived: function (notification, payload) {
         if (notification === 'DATARECEIVED') {
             this.items = payload;
+            this.loaded = true;
             this.updateDom();
             this.scheduleUpdate();
         }
@@ -51,7 +52,6 @@ Module.register('MMM-MVG-LocalTransport', {
         return ['MMM-MVG-LocalTransport.css', 'font-awesome.css'];
     },
     getDom: function () {
-        Log.info(this.name + ' : Getting DOM');
         var wrapper = document.createElement('div');
 
         if (this.config.id === '') {
@@ -81,31 +81,19 @@ Module.register('MMM-MVG-LocalTransport', {
                 table.appendChild(row);
 
                 var lineCell = document.createElement('td');
-                lineCell.className = item['product'];
+                lineCell.className = item['product'] + ' mmm-mvg-row-line';
                 lineCell.innerHTML = item['label'];
                 row.appendChild(lineCell);
 
                 var destCell = document.createElement('td');
-                //destCell.className = item['product'];
+                destCell.className = 'mmm-mvg-row-destination';
                 destCell.innerHTML = key;
                 row.appendChild(destCell);
 
                 var minutesCell = document.createElement('td');
-                //minutesCell.className = item['product'];
+                minutesCell.className = 'mmm-mvg-row-minutes';
                 minutesCell.innerHTML = item['departureTimes'].join(', ');
                 row.appendChild(minutesCell);
-
-                /*if (this.config.fade && this.config.fadePoint < 1) {
-                 if (this.config.fadePoint < 0) {
-                 this.config.fadePoint = 0;
-                 }
-                 var startingPoint = this.items.length * this.config.fadePoint;
-                 var steps = this.items.length - startingPoint;
-                 if (t >= startingPoint) {
-                 var currentStep = t - startingPoint;
-                 row.style.opacity = 1 - (1 / steps * currentStep);
-                 }
-                 }*/
             }
         }
 

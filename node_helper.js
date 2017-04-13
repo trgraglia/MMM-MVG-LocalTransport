@@ -14,16 +14,16 @@ var request = require('request');
 
 module.exports = NodeHelper.create({
     start: function () {
-        this.items = {};
+        this.config = {};
     },
     socketNotificationReceived: function (notification, payload) {
         if (notification === 'GETDATA') {
-            var self = this;
-            this.getStationData(self.processJson);
+            this.config = payload;
+            this.getStationData(this.config, this.processJson);
+            //this.sendSocketNotification('DATARECEIVED', this.config);
         }
     },
-    processJson: function (data) {
-        var json = JSON.parse(data);
+    processJson: function (json) {
         var departures = json['departures'];
         var now = new Date();
         var items = {};
@@ -45,14 +45,20 @@ module.exports = NodeHelper.create({
 
         return items;
     },
-    getStationData: function (callback) {
+    getStationData: function (config, callback) {
         var self = this;
-        var url = self.url;
 
-        request(url, function (error, response, body) {
+        request({
+            uri: config.apiBase,
+            method: 'GET',
+            form: {
+                station: config.id
+            },
+            json: true
+        }, function (error, response, json) {
             if (!error && response.statusCode == 200) {
-                var structuredData = callback(body);
-                self.sendSocketNotification('DATARECEIVED', structuredData);
+                var data = callback(json);
+                self.sendSocketNotification('DATARECEIVED', data);
             } else {
                 console.log(self.name + ' : ERROR : ' + error)
             }
