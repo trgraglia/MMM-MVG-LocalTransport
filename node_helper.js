@@ -31,7 +31,7 @@ module.exports = NodeHelper.create({
             .send(JSON.stringify(data))
             .end(function (response) {
                 if (response.error) {
-                    self.updateDom(this.config.animationSpeed);
+                    this.updateDom(this.config.animationSpeed);
                     console.log(self.name + " : " + response.error);
                     retry = false;
                 } else {
