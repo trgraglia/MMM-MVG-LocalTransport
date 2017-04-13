@@ -29,7 +29,7 @@ module.exports = NodeHelper.create({
         unirest.get(url)
             .headers({
                 'Content-Type': 'application/json;charset=UTF-8',
-                'Accept', 'application/json'
+                'Accept': 'application/json'
             })
             .send(JSON.stringify(data))
             .end(function (response) {
