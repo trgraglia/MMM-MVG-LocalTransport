@@ -27,25 +27,29 @@ module.exports = NodeHelper.create({
         var data = {};
 
         unirest.get(url)
-            .headers({
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            })
+            .headers({})
             .send(JSON.stringify(data))
             .end(function (response) {
-                console.log("RESPONSE: ", JSON.stringify(response));
-                self.processTrains(response['departures']);
+                if (response.error) {
+                    self.updateDom(this.config.animationSpeed);
+                    console.log(self.name + " : " + response.error);
+                    retry = false;
+                } else {
+                    console.log("body: ", JSON.stringify(response.body));
+                    self.processTrains(response.body);
+                }
 
-                /*if (retry) {
-                 this.scheduleUpdate(this.loaded ? -1 : this.config.retryDelay);
-                 }*/
+                if (retry) {
+                    self.scheduleUpdate((self.loaded) ? -1 : this.config.retryDelay);
+                }
             });
     },
 
     /* processTrains(departures)
      * Uses the received data to build a data structure for rendering.
      */
-    processTrains: function (departures) {
+    processTrains: function (data) {
+        var departures = data['departures'];
         var now = new Date();
         var items = {};
 

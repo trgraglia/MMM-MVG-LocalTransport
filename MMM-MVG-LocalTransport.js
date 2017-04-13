@@ -13,6 +13,7 @@ Module.register("MMM-MVG-LocalTransport", {
 
     // Define module defaults
     defaults: {
+        retryDelay: 1000,
         maximumEntries: 10, // Total Maximum Entries
         maxTimeOffset: 200, // Max time in the future for entries
         useRealtime: true,
@@ -92,16 +93,16 @@ Module.register("MMM-MVG-LocalTransport", {
                 row.appendChild(minutesCell);
 
                 /*if (this.config.fade && this.config.fadePoint < 1) {
-                    if (this.config.fadePoint < 0) {
-                        this.config.fadePoint = 0;
-                    }
-                    var startingPoint = this.items.length * this.config.fadePoint;
-                    var steps = this.items.length - startingPoint;
-                    if (t >= startingPoint) {
-                        var currentStep = t - startingPoint;
-                        row.style.opacity = 1 - (1 / steps * currentStep);
-                    }
-                }*/
+                 if (this.config.fadePoint < 0) {
+                 this.config.fadePoint = 0;
+                 }
+                 var startingPoint = this.items.length * this.config.fadePoint;
+                 var steps = this.items.length - startingPoint;
+                 if (t >= startingPoint) {
+                 var currentStep = t - startingPoint;
+                 row.style.opacity = 1 - (1 / steps * currentStep);
+                 }
+                 }*/
             }
         }
 
