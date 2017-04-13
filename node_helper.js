@@ -7,48 +7,67 @@
  * MIT Licensed.
  */
 
-const NodeHelper = require("node_helper");
-const forge = require('node-forge');
-const unirest = require('unirest');
+var NodeHelper = require("node_helper");
+var forge = require('node-forge');
+var unirest = require('unirest');
 
 module.exports = NodeHelper.create({
-
     start: function () {
+        console.log(this.name + ' helper started');
         this.started = false;
     },
+    socketNotificationReceived: function (notification, payload) {
+        if (notification === (this.name + '_CONFIG') && !this.started) {
+            this.config = payload;
+            this.started = true;
+            this.scheduleUpdate(this.config.initialLoadDelay);
+        }
+    },
+    /***
+     * scheduleUpdate()
+     * Schedules the next update.
+     * @integer - Milliseconds before next update. If empty, this.config.updateInterval is used.
+     */
+    scheduleUpdate: function (delay) {
+        var self = this;
 
-    /* updateTimetable(transports)
+        clearTimeout(self.updateTimer);
+        self.updateTimer = setTimeout(function () {
+            self.updateTimetable();
+        }, !!delay ? delay : self.config.updateInterval);
+    },
+    /***
+     * updateTimetable()
      * Calls processTrains on successful response.
      */
     updateTimetable: function () {
         var self = this;
-        var url = this.config.apiBase + this.config.id;
         var retry = true;
-        var data = {};
+        var req = unirest.get(self.config.apiBase + self.config.id);
+        req.headers({
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Accept': 'application/json'
+        });
+        //var data = {};
+        //req.send(JSON.stringify(data));
+        req.end(function (response) {
+            console.log(self.name + " : " + response);
 
-        unirest.get(url)
-            .headers({
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Accept': 'application/json'
-            })
-            .send(JSON.stringify(data))
-            .end(function (response) {
-                if (response.error) {
-                    this.updateDom(this.config.animationSpeed);
-                    console.log(self.name + " : " + response.error);
-                    retry = false;
-                } else {
-                    console.log("body: ", JSON.stringify(response.body));
-                    self.processTrains(response.body);
-                }
+            if (response.error) {
+                this.updateDom(this.config.animationSpeed);
 
-                if (retry) {
-                    self.scheduleUpdate((self.loaded) ? -1 : this.config.retryDelay);
-                }
-            });
+                retry = false;
+            } else {
+                self.processTrains(response.body);
+            }
+
+            if (retry) {
+                self.scheduleUpdate();
+            }
+        });
     },
-
-    /* processTrains(departures)
+    /***
+     * processTrains(departures)
      * Uses the received data to build a data structure for rendering.
      */
     processTrains: function (data) {
@@ -74,31 +93,5 @@ module.exports = NodeHelper.create({
         this.items = items;
         this.loaded = true;
         this.sendSocketNotification("TRAINS", this.items);
-    },
-
-    /* scheduleUpdate()
-     * Schedule next update.
-     * argument delay number - Millis econds before next update. If empty, this.config.updateInterval is used.
-     */
-    scheduleUpdate: function (delay) {
-        var nextLoad = this.config.updateInterval;
-        if (typeof delay !== "undefined" && delay >= 0) {
-            nextLoad = delay;
-        }
-
-        var self = this;
-        clearTimeout(this.updateTimer);
-        this.updateTimer = setTimeout(function () {
-            self.updateTimetable();
-        }, nextLoad);
-    },
-
-    socketNotificationReceived: function (notification, payload) {
-        const self = this;
-        if (notification === 'CONFIG' && this.started == false) {
-            this.config = payload;
-            this.started = true;
-            self.scheduleUpdate(this.config.initialLoadDelay);
-        }
     }
 });

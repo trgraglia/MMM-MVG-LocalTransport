@@ -17,7 +17,7 @@ Module.register("MMM-MVG-LocalTransport", {
         maximumEntries: 10, // Total Maximum Entries
         maxTimeOffset: 200, // Max time in the future for entries
         useRealtime: true,
-        updateInterval: 1 * 60 * 1000, // Update every minute.
+        updateInterval: 30 * 1000, // Update every minute.
         animationSpeed: 2000,
         fade: true,
         fadePoint: 0.25, // Start on 1/4th of the list.
