@@ -37,7 +37,7 @@ Module.register('MMM-MVG-LocalTransport', {
 
         clearTimeout(this.updateTimer);
         this.updateTimer = setTimeout(function () {
-            self.sendSocketNotification('GETDATA', self.config);
+            self.sendSocketNotification('GETDATA', '');
         }, !!delay ? delay : this.config.updateInterval);
     },
     socketNotificationReceived: function(notification, payload) {

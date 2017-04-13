@@ -14,13 +14,12 @@ var request = require('request');
 
 module.exports = NodeHelper.create({
     start: function () {
-        this.config = {};
+        this.items = {};
     },
     socketNotificationReceived: function (notification, payload) {
         if (notification === 'GETDATA') {
-            this.config = payload;
-            this.getStationData(this.processJson);
-            this.sendSocketNotification('DATARECEIVED', this.config);
+            var self = this;
+            this.getStationData(self.processJson);
         }
     },
     processJson: function (data) {
