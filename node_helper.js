@@ -14,14 +14,14 @@ var request = require('request');
 
 module.exports = NodeHelper.create({
     start: function () {
-        console.log(this.name + ': Node Helper Start');
+        console.log('--- ' + this.name + ': Node Helper Start');
         this.config = {};
-        console.log(JSON.stringify(this.config));
+        console.log('--- ' + JSON.stringify(this.config));
     },
     socketNotificationReceived: function (notification, payload) {
-        console.log(this.name + ': Socket Notification Received');
-        console.log(notification);
-        console.log(JSON.stringify(payload));
+        console.log('--- ' + this.name + ': Socket Notification Received');
+        console.log('--- ' + notification);
+        console.log('--- ' + JSON.stringify(payload));
 
         if (notification === 'GETDATA') {
             this.config = payload;
@@ -30,8 +30,8 @@ module.exports = NodeHelper.create({
         }
     },
     processJson: function (json) {
-        console.log(this.name + ': Process JSON');
-        console.log(JSON.stringify(json));
+        console.log('--- ' + this.name + ': Process JSON');
+        console.log('--- ' + JSON.stringify(json));
 
         var departures = json['departures'];
         var now = new Date();
@@ -55,8 +55,8 @@ module.exports = NodeHelper.create({
         return items;
     },
     getStationData: function (config, callback) {
-        console.log(this.name + ': Get Station Data');
-        console.log(JSON.stringify(config));
+        console.log('--- ' + this.name + ': Get Station Data');
+        console.log('--- ' + JSON.stringify(config));
 
         var self = this;
 
@@ -68,11 +68,15 @@ module.exports = NodeHelper.create({
             },
             json: true
         }, function (error, response, json) {
+            console.log('--- ' + 'error: ' + JSON.stringify(json));
+            console.log('--- ' + 'response: ' + JSON.stringify(json));
+            console.log('--- ' + 'json: ' + JSON.stringify(json));
+
             if (!error && response.statusCode == 200) {
                 var data = callback(json);
                 self.sendSocketNotification('DATARECEIVED', data);
             } else {
-                console.log(self.name + ' : ERROR : ' + error)
+                console.log('--- ' + self.name + ' : ERROR : ' + error)
             }
         });
     }
