@@ -17,7 +17,6 @@ Module.register('MMM-MVG-LocalTransport', {
         fade: true,
         fadePoint: 0.25, // Start on 1/4th of the list.
         initialLoadDelay: 0, // start delay seconds.
-        //apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py?station=',
         apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py',
         id: ''
     },
@@ -78,6 +77,7 @@ Module.register('MMM-MVG-LocalTransport', {
                 var item = items[key];
 
                 var row = document.createElement('tr');
+                row.className = 'normal mmm-mvg-row';
                 table.appendChild(row);
 
                 var lineCell = document.createElement('td');

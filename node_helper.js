@@ -64,8 +64,8 @@ module.exports = NodeHelper.create({
             uri: config.apiBase + '?station=' + config.id,
             method: 'GET',
             /*form: {
-                station: config.id
-            },*/
+             station: config.id
+             },*/
             json: true
         }, function (error, response, json) {
             console.log('--- ' + 'error: ' + JSON.stringify(json));
@@ -73,7 +73,7 @@ module.exports = NodeHelper.create({
             console.log('--- ' + 'json: ' + JSON.stringify(json));
 
             if (!error && response.statusCode == 200) {
-                var data = callback(json);
+                var data = callback.call(self, json);
                 self.sendSocketNotification('DATARECEIVED', data);
             } else {
                 console.log('--- ' + self.name + ' : ERROR : ' + error)
