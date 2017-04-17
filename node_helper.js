@@ -4,8 +4,6 @@
  * Module: MVG-LocalTransport
  *
  * By Anthony Graglia
- * Derived from Georg Peters (https://lane6.de)
- * 
  * MIT Licensed.
  */
 
@@ -15,18 +13,15 @@ var request = require('request');
 module.exports = NodeHelper.create({
     start: function () {
         console.log('--- ' + this.name + ': Node Helper Start');
+
         this.config = {};
-        console.log('--- ' + JSON.stringify(this.config));
     },
     socketNotificationReceived: function (notification, payload) {
-        console.log('--- ' + this.name + ': Socket Notification Received');
-        console.log('--- ' + notification);
-        console.log('--- ' + JSON.stringify(payload));
+        if (notification === 'MMM-MVG-GETDATA') {
+            console.log('--- ' + this.name + ': Socket Notification Received: ' + notification);
 
-        if (notification === 'GETDATA') {
             this.config = payload;
             this.getStationData(this.config, this.processJson);
-            //this.sendSocketNotification('DATARECEIVED', this.config);
         }
     },
     processJson: function (json) {
@@ -56,27 +51,22 @@ module.exports = NodeHelper.create({
     },
     getStationData: function (config, callback) {
         console.log('--- ' + this.name + ': Get Station Data');
-        console.log('--- ' + JSON.stringify(config));
 
         var self = this;
 
         request({
             uri: config.apiBase + '?station=' + config.id,
             method: 'GET',
-            /*form: {
-             station: config.id
-             },*/
             json: true
         }, function (error, response, json) {
-            console.log('--- ' + 'error: ' + JSON.stringify(json));
-            console.log('--- ' + 'response: ' + JSON.stringify(json));
-            console.log('--- ' + 'json: ' + JSON.stringify(json));
-
             if (!error && response.statusCode == 200) {
                 var data = callback.call(self, json);
-                self.sendSocketNotification('DATARECEIVED', data);
+                self.sendSocketNotification('MMM-MVG-DATARECEIVED', data);
             } else {
-                console.log('--- ' + self.name + ' : ERROR : ' + error)
+                console.log('--- ' + self.name + ' : ERROR : ' + error);
+                console.log('--- ' + 'error: ' + JSON.stringify(json));
+                console.log('--- ' + 'response: ' + JSON.stringify(json));
+                console.log('--- ' + 'json: ' + JSON.stringify(json));
             }
         });
     }

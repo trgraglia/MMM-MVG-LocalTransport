@@ -1,11 +1,11 @@
+'use strict';
+
 /* Timetable for local transport Module */
 
 /* Magic Mirror
  * Module: MVG-LocalTransport
  *
  * By Anthony Graglia
- * Derived from Georg Peters (https://lane6.de)
- *
  * MIT Licensed.
  */
 
@@ -27,20 +27,22 @@ Module.register('MMM-MVG-LocalTransport', {
         this.updateTimer = null;
         this.scheduleUpdate();
 
-        setInterval(function () {
-            self.updateDom();
-        }, 30000);
+        /*setInterval(function () {
+         self.updateDom();
+         }, 30000);*/
+
+        self.sendSocketNotification('MMM-MVG-GETDATA', self.config);
     },
     scheduleUpdate: function (delay) {
         var self = this;
 
         clearTimeout(this.updateTimer);
         this.updateTimer = setTimeout(function () {
-            self.sendSocketNotification('GETDATA', self.config);
+            self.sendSocketNotification('MMM-MVG-GETDATA', self.config);
         }, !!delay ? delay : this.config.updateInterval);
     },
     socketNotificationReceived: function (notification, payload) {
-        if (notification === 'DATARECEIVED') {
+        if (notification === 'MMM-MVG-DATARECEIVED') {
             this.items = payload;
             this.loaded = true;
             this.updateDom();
@@ -77,21 +79,21 @@ Module.register('MMM-MVG-LocalTransport', {
                 var item = items[key];
 
                 var row = document.createElement('tr');
-                row.className = 'normal mmm-mvg-row';
+                row.className = 'mmm-mvg-row normal';
                 table.appendChild(row);
 
                 var lineCell = document.createElement('td');
-                lineCell.className = item['product'] + ' mmm-mvg-row-line';
+                lineCell.className = item['product'] + ' mmm-mvg-row-line bright';
                 lineCell.innerHTML = item['label'];
                 row.appendChild(lineCell);
 
                 var destCell = document.createElement('td');
-                destCell.className = 'mmm-mvg-row-destination';
+                destCell.className = 'mmm-mvg-row-destination bright';
                 destCell.innerHTML = key;
                 row.appendChild(destCell);
 
                 var minutesCell = document.createElement('td');
-                minutesCell.className = 'mmm-mvg-row-minutes';
+                minutesCell.className = 'mmm-mvg-row-minutes light';
                 minutesCell.innerHTML = item['departureTimes'].join(', ');
                 row.appendChild(minutesCell);
             }
