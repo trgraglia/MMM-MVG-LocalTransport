@@ -61,11 +61,11 @@ module.exports = NodeHelper.create({
         var self = this;
 
         request({
-            uri: config.apiBase,
+            uri: config.apiBase + '?station=' + config.id,
             method: 'GET',
-            form: {
+            /*form: {
                 station: config.id
-            },
+            },*/
             json: true
         }, function (error, response, json) {
             console.log('--- ' + 'error: ' + JSON.stringify(json));
