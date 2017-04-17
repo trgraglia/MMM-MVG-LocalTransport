@@ -24,7 +24,7 @@ Module.register('MMM-MVG-LocalTransport', {
     start: function () {
         var self = this;
 
-        Log.info('Starting module: ' + this.name);
+        Log.info('--- ' + this.name + ': Starting module');
         this.updateTimer = null;
         this.scheduleUpdate();
 
