@@ -10,7 +10,8 @@
 .mmm-mvg-row-line.b {
 }
 
-.mmm-mvg-row-line.s {
+.mmm-mvg-row-line.s:before {
+    content: "S";
 }
 
 .mmm-mvg-row-line.u {

@@ -83,7 +83,7 @@ Module.register('MMM-MVG-LocalTransport', {
                 table.appendChild(row);
 
                 var lineCell = document.createElement('td');
-                lineCell.className = item['product'] + ' mmm-mvg-row-line bright';
+                lineCell.className = item['product'] + ' mmm-mvg-row-line';
                 lineCell.innerHTML = item['label'];
                 row.appendChild(lineCell);
 
@@ -93,7 +93,7 @@ Module.register('MMM-MVG-LocalTransport', {
                 row.appendChild(destCell);
 
                 var minutesCell = document.createElement('td');
-                minutesCell.className = 'mmm-mvg-row-minutes light';
+                minutesCell.className = 'mmm-mvg-row-minutes';
                 minutesCell.innerHTML = item['departureTimes'].join(', ');
                 row.appendChild(minutesCell);
             }
