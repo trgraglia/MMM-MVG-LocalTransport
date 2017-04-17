@@ -14,9 +14,15 @@ var request = require('request');
 
 module.exports = NodeHelper.create({
     start: function () {
+        console.log(this.name + ': Node Helper Start');
         this.config = {};
+        console.log(JSON.stringify(this.config));
     },
     socketNotificationReceived: function (notification, payload) {
+        console.log(this.name + ': Socket Notification Received');
+        console.log(notification);
+        console.log(JSON.stringify(payload));
+
         if (notification === 'GETDATA') {
             this.config = payload;
             this.getStationData(this.config, this.processJson);
@@ -24,6 +30,9 @@ module.exports = NodeHelper.create({
         }
     },
     processJson: function (json) {
+        console.log(this.name + ': Process JSON');
+        console.log(JSON.stringify(json));
+
         var departures = json['departures'];
         var now = new Date();
         var items = {};
@@ -46,6 +55,9 @@ module.exports = NodeHelper.create({
         return items;
     },
     getStationData: function (config, callback) {
+        console.log(this.name + ': Get Station Data');
+        console.log(JSON.stringify(config));
+
         var self = this;
 
         request({
