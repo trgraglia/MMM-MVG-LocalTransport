@@ -20,7 +20,10 @@ module.exports = NodeHelper.create({
         if (notification === 'MMM-MVG-GETDATA') {
             console.log('--- ' + this.name + ': Socket Notification Received: ' + notification);
 
-            this.config = payload;
+            if (!this.configSet) {
+                this.config = payload;
+            }
+            this.configSet = true;
             this.getStationData(this.config, this.processJson);
         }
     },
