@@ -13,23 +13,15 @@ var request = require('request');
 module.exports = NodeHelper.create({
     start: function () {
         console.log('--- ' + this.name + ': Node Helper Start');
-
-        this.config = {};
     },
     socketNotificationReceived: function (notification, payload) {
         if (notification === 'MMM-MVG-GETDATA') {
             console.log('--- ' + this.name + ': Socket Notification Received: ' + notification);
-
-            if (!this.configSet) {
-                this.config = payload;
-            }
-            this.configSet = true;
-            this.getStationData(this.config, this.processJson);
+            this.getStationData(payload, this.processJson);
         }
     },
     processJson: function (json) {
         console.log('--- ' + this.name + ': Process JSON');
-        //console.log('--- ' + JSON.stringify(json));
 
         var departures = json['departures'];
         var now = new Date();
@@ -44,7 +36,6 @@ module.exports = NodeHelper.create({
             items[destination] = items[destination] || {
                     'label': departure['label'],
                     'product': departure['product'],
-                    //'lineColor': departure['lineBackgroundColor'],
                     'departureTimes': []
                 };
             items[destination]['departureTimes'].push(departureMinutes);
@@ -64,13 +55,13 @@ module.exports = NodeHelper.create({
         }, function (error, response, json) {
             if (!error && response.statusCode == 200) {
                 var data = callback.call(self, json);
-                self.sendSocketNotification('MMM-MVG-DATARECEIVED', {id: self.config.id, data: data});
+                self.sendSocketNotification('MMM-MVG-DATARECEIVED', {id: this.id, data: data});
             } else {
                 console.log('--- ' + self.name + ' : ERROR : ' + error);
                 console.log('--- ' + 'error: ' + JSON.stringify(json));
                 console.log('--- ' + 'response: ' + JSON.stringify(json));
                 console.log('--- ' + 'json: ' + JSON.stringify(json));
             }
-        });
+        }.bind({id: config.id}));
     }
 });
