@@ -43,10 +43,12 @@ Module.register('MMM-MVG-LocalTransport', {
     },
     socketNotificationReceived: function (notification, payload) {
         if (notification === 'MMM-MVG-DATARECEIVED') {
-            this.items = payload;
-            this.loaded = true;
-            this.updateDom();
-            this.scheduleUpdate();
+            if (payload.id === this.config.id) {
+                this.items = payload.data;
+                this.loaded = true;
+                this.updateDom();
+                this.scheduleUpdate();
+            }
         }
     },
     getStyles: function () {

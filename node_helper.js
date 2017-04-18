@@ -41,7 +41,7 @@ module.exports = NodeHelper.create({
             items[destination] = items[destination] || {
                     'label': departure['label'],
                     'product': departure['product'],
-                    'lineColor': departure['lineBackgroundColor'],
+                    //'lineColor': departure['lineBackgroundColor'],
                     'departureTimes': []
                 };
             items[destination]['departureTimes'].push(departureMinutes);
@@ -61,7 +61,7 @@ module.exports = NodeHelper.create({
         }, function (error, response, json) {
             if (!error && response.statusCode == 200) {
                 var data = callback.call(self, json);
-                self.sendSocketNotification('MMM-MVG-DATARECEIVED', data);
+                self.sendSocketNotification('MMM-MVG-DATARECEIVED', {id: self.config.id, data: data});
             } else {
                 console.log('--- ' + self.name + ' : ERROR : ' + error);
                 console.log('--- ' + 'error: ' + JSON.stringify(json));
