@@ -22,16 +22,13 @@ Module.register('MMM-MVG-LocalTransport', {
     },
     start: function () {
         var self = this;
-
         Log.info('--- ' + this.name + ': Starting module');
         this.updateTimer = null;
         this.scheduleUpdate();
 
-        /*setInterval(function () {
-         self.updateDom();
-         }, 30000);*/
-
-        self.sendSocketNotification('MMM-MVG-GETDATA', self.config);
+        setInterval(function () {
+            self.updateDom();
+        }, 30000);
     },
     scheduleUpdate: function (delay) {
         var self = this;
@@ -46,9 +43,9 @@ Module.register('MMM-MVG-LocalTransport', {
             if (payload.id === this.config.id) {
                 this.items = payload.data;
                 this.loaded = true;
-                this.updateDom();
-                this.scheduleUpdate();
             }
+            this.updateDom();
+            this.scheduleUpdate();
         }
     },
     getStyles: function () {

@@ -26,7 +26,7 @@ module.exports = NodeHelper.create({
     },
     processJson: function (json) {
         console.log('--- ' + this.name + ': Process JSON');
-        console.log('--- ' + JSON.stringify(json));
+        //console.log('--- ' + JSON.stringify(json));
 
         var departures = json['departures'];
         var now = new Date();
