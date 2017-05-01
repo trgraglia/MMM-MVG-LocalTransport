@@ -39,12 +39,33 @@ Module.register('MMM-MVG-LocalTransport', {
     socketNotificationReceived: function (notification, payload) {
         if (notification === 'MMM-MVG-DATARECEIVED') {
             if (payload.id === this.config.id) {
-                this.items = payload.data;
+                this.departures = payload.data;
                 this.loaded = true;
             }
             this.updateDom();
             this.scheduleUpdate();
         }
+    },
+    processJson: function () {
+        var departures = this.departures;
+        var now = moment();
+        var items = {};
+
+        for (var i = 0; i < departures.length; i++) {
+            var departure = departures[i];
+            var destination = departure['destination'];
+            var departureTime = moment(departure['departureTime']);
+            var departureMinutes = Math.floor(moment.duration(departureTime.diff(now)).asMinutes());
+
+            items[destination] = items[destination] || {
+                    'label': departure['label'],
+                    'product': departure['product'],
+                    'departureTimes': []
+                };
+            items[destination]['departureTimes'].push(departureMinutes);
+        }
+
+        return items;
     },
     getStyles: function () {
         return ['MMM-MVG-LocalTransport.css', 'font-awesome.css'];
@@ -69,7 +90,7 @@ Module.register('MMM-MVG-LocalTransport', {
         var table = document.createElement('table');
         table.className = 'small mmm-mvg-table';
 
-        var items = this.items;
+        var items = this.processJson();
 
         for (var key in items) {
             if (items.hasOwnProperty(key)) {
