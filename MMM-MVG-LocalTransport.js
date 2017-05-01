@@ -55,7 +55,7 @@ Module.register('MMM-MVG-LocalTransport', {
             var departure = departures[i];
             var destination = departure['destination'];
             var departureTime = moment(departure['departureTime']);
-            var departureMinutes = moment.duration(departureTime.diff(now, 'minutes'));
+            var departureMinutes = departureTime.diff(now, 'minutes');
 
             items[destination] = items[destination] || {
                     'label': departure['label'],

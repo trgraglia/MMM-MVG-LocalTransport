@@ -28,9 +28,12 @@ module.exports = NodeHelper.create({
         var self = this;
 
         request({
-            uri: self.config.apiBase + '?station=' + self.config.id,
+            uri: self.config.apiBase + '?station=' + self.config.id + '&cache=' + Math.floor(Math.random() * 100000),
             method: 'GET',
-            json: true
+            json: true,
+            headers: {
+
+            }
         }, function (error, response, json) {
             if (!error && response.statusCode == 200) {
                 if (self.config.debug) {
