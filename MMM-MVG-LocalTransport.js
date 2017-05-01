@@ -11,22 +11,23 @@
 
 Module.register('MMM-MVG-LocalTransport', {
     defaults: {
-        retryDelay: 10000,
-        updateInterval: 30000,
+        dataUpdateInterval: 30000,
+        domUpdateInterval: 20000,
         apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py',
         id: '',
         debug: false,
         perLineDepartureLimit: 3
     },
     start: function () {
-        var self = this;
         Log.info('--- ' + this.name + ': Starting module');
+
+        var self = this;
         this.updateTimer = null;
-        this.scheduleUpdate(10);
+        this.scheduleUpdate(100);
 
         setInterval(function () {
             self.updateDom();
-        }, 15000);
+        }, this.config.domUpdateInterval);
     },
     scheduleUpdate: function (delay) {
         var self = this;
@@ -34,7 +35,7 @@ Module.register('MMM-MVG-LocalTransport', {
         clearTimeout(this.updateTimer);
         this.updateTimer = setTimeout(function () {
             self.sendSocketNotification('MMM-MVG-GETDATA', self.config);
-        }, !!delay ? delay : this.config.updateInterval);
+        }, !!delay ? delay : this.config.dataUpdateInterval);
     },
     socketNotificationReceived: function (notification, payload) {
         if (notification === 'MMM-MVG-DATARECEIVED') {
@@ -42,6 +43,7 @@ Module.register('MMM-MVG-LocalTransport', {
                 this.departures = payload.data;
                 this.loaded = true;
             }
+
             this.updateDom();
             this.scheduleUpdate();
         }
