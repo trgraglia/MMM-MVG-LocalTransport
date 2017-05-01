@@ -22,7 +22,7 @@ Module.register('MMM-MVG-LocalTransport', {
         var self = this;
         Log.info('--- ' + this.name + ': Starting module');
         this.updateTimer = null;
-        this.scheduleUpdate();
+        this.scheduleUpdate(10);
 
         setInterval(function () {
             self.updateDom();
@@ -55,7 +55,7 @@ Module.register('MMM-MVG-LocalTransport', {
             var departure = departures[i];
             var destination = departure['destination'];
             var departureTime = moment(departure['departureTime']);
-            var departureMinutes = Math.floor(moment.duration(departureTime.diff(now)).asMinutes());
+            var departureMinutes = moment.duration(departureTime.diff(now, 'minutes'));
 
             items[destination] = items[destination] || {
                     'label': departure['label'],
