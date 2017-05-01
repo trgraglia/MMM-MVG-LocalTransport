@@ -11,14 +11,12 @@
 
 Module.register('MMM-MVG-LocalTransport', {
     defaults: {
-        retryDelay: 1000,
-        updateInterval: 30 * 1000, // Update every minute.
-        animationSpeed: 2000,
-        fade: true,
-        fadePoint: 0.25, // Start on 1/4th of the list.
-        initialLoadDelay: 0, // start delay seconds.
+        retryDelay: 10000,
+        updateInterval: 30000,
         apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py',
-        id: ''
+        id: '',
+        debug: false,
+        perLineDepartureLimit: 3
     },
     start: function () {
         var self = this;
@@ -28,7 +26,7 @@ Module.register('MMM-MVG-LocalTransport', {
 
         setInterval(function () {
             self.updateDom();
-        }, 30000);
+        }, 15000);
     },
     scheduleUpdate: function (delay) {
         var self = this;
@@ -76,6 +74,11 @@ Module.register('MMM-MVG-LocalTransport', {
         for (var key in items) {
             if (items.hasOwnProperty(key)) {
                 var item = items[key];
+                var departureTimes = item['departureTimes'];
+
+                if (departureTimes.length > this.config.perLineDepartureLimit) {
+                    departureTimes.length = this.config.perLineDepartureLimit;
+                }
 
                 var row = document.createElement('tr');
                 row.className = 'mmm-mvg-row normal';
@@ -93,7 +96,7 @@ Module.register('MMM-MVG-LocalTransport', {
 
                 var minutesCell = document.createElement('td');
                 minutesCell.className = 'mmm-mvg-row-minutes';
-                minutesCell.innerHTML = item['departureTimes'].join(', ');
+                minutesCell.innerHTML = departureTimes.join(', ');
                 row.appendChild(minutesCell);
             }
         }
