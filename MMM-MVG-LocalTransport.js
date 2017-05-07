@@ -11,6 +11,7 @@
 
 Module.register('MMM-MVG-LocalTransport', {
     defaults: {
+        initialUpdateInterval: 30000,
         dataUpdateInterval: 30000,
         domUpdateInterval: 20000,
         apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py',
@@ -23,7 +24,7 @@ Module.register('MMM-MVG-LocalTransport', {
 
         var self = this;
         this.updateTimer = null;
-        this.scheduleUpdate(100);
+        this.scheduleUpdate(this.config.initialUpdateInterval);
 
         setInterval(function () {
             self.updateDom();
