@@ -28,23 +28,18 @@ module.exports = NodeHelper.create({
         var self = this;
 
         request({
-            uri: self.config.apiBase + '?station=' + self.config.id + '&cache=' + Math.floor(Math.random() * 100000),
+            uri: self.config.apiBaseStation + self.config.id,
             method: 'GET',
             json: true,
-            headers: {
-
-            }
+            headers: {}
         }, function (error, response, json) {
-            if (!error && response.statusCode == 200) {
+            if (!error && response['statusCode'] == 200) {
                 if (self.config.debug) {
                     console.log(json);
                 }
                 self.sendSocketNotification('MMM-MVG-DATARECEIVED', {id: this.id, data: json['departures']});
             } else {
-                console.log('--- ' + self.name + ' : ERROR : ' + error);
-                console.log('--- ' + 'error: ' + JSON.stringify(json));
-                console.log('--- ' + 'response: ' + JSON.stringify(json));
-                console.log('--- ' + 'json: ' + JSON.stringify(json));
+                self.sendSocketNotification('MMM-MVG-ERRORRECEIVED', {id: this.id, data: json});
             }
         }.bind({id: self.config.id}));
     }
