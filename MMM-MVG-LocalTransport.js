@@ -1,7 +1,5 @@
 'use strict';
 
-/* Timetable for local transport Module */
-
 /* Magic Mirror
  * Module: MVG-LocalTransport
  *
@@ -11,12 +9,24 @@
 
 Module.register('MMM-MVG-LocalTransport', {
     defaults: {
-        initialUpdateInterval: 30000,
-        dataUpdateInterval: 30000,
-        domUpdateInterval: 20000,
-        apiBase: 'http://anthonygraglia.com/cgi-bin/mvg.py',
+        /***
+         * Interval for calling the API the first time after the module has started.
+         */
+        initialUpdateInterval: 15 * 1000,
+        /***
+         * Interval for calling the API again for data after a failed API call.
+         */
+        retryUpdateInterval: 10 * 1000,
+        /***
+         * Interval for calling the API for data.
+         */
+        dataUpdateInterval: 60 * 1000,
+        /***
+         * Interval for updating the DOM. Uses the current data.
+         */
+        domUpdateInterval: 20 * 1000,
+        apiBaseStation: '',
         id: '',
-        debug: false,
         perLineDepartureLimit: 3
     },
     start: function () {
@@ -32,6 +42,7 @@ Module.register('MMM-MVG-LocalTransport', {
     },
     scheduleUpdate: function (delay) {
         var self = this;
+        this.config.now = Date.now();
 
         clearTimeout(this.updateTimer);
         this.updateTimer = setTimeout(function () {
@@ -40,6 +51,8 @@ Module.register('MMM-MVG-LocalTransport', {
     },
     socketNotificationReceived: function (notification, payload) {
         if (notification === 'MMM-MVG-DATARECEIVED') {
+            Log.info(payload);
+
             if (payload.id === this.config.id) {
                 this.departures = payload.data;
                 this.loaded = true;
@@ -47,6 +60,16 @@ Module.register('MMM-MVG-LocalTransport', {
 
             this.updateDom();
             this.scheduleUpdate();
+        }
+
+        if (notification === 'MMM-MVG-ERRORRECEIVED') {
+            Log.info(payload);
+
+            if (payload.id === this.config.id) {
+            }
+
+            this.updateDom();
+            this.scheduleUpdate(this.config.retryUpdateInterval);
         }
     },
     processJson: function () {
